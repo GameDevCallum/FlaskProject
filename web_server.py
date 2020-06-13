@@ -17,4 +17,4 @@ def error404(error):
     return render_template("error.html", EC="Error! Page Not Found!"), 404
 
 if __name__ == "__main__":
-    web_server.run(port="3000")
+    web_server.run(port="5600")
