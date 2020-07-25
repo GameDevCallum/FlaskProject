@@ -31,8 +31,8 @@ def update():
 @web_server.route("/", methods=["POST", "GET"])
 @web_server.route("/home", methods=["POST", "GET"])
 def index():
-
     if request.method == "POST":
+        print("[[FROM POST]]")
         usr = request.form["username"]
         message = request.form["message-to-send"]
 
@@ -51,6 +51,7 @@ def index():
 
         return render_template("index.html")
     else:
+        print("[[FROM PAGE]]")
         return render_template("index.html")
 
 """ ERROR HANDLING """
