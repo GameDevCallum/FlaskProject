@@ -8,7 +8,16 @@
     </head>
 
     <body>
-        <h1>Hello World</h1>
+        <form action="#" method="post">
+            <p>Username: </p>
+            <input type="text" placeholder="Username" name="username" />
+            
+            <p>Send Message: </p>
+            <input type="text" placeholder="Message" name="message-to-send" />
+            <input type="submit" value="Send Message" />
+        </form>
+
+        <h2>{{user, msg}}</h2>
     </body>
 </html>
 
