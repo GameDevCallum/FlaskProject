@@ -20,16 +20,17 @@ class Messages(db.Model):
         self.username = username
         self.msg = msg
 
+def update():
+    for m in Messages.query.all():
+        m_user = m.username
+        m_msg = m.msg
+        print(f"USERNAME: {m_user} | MESSAGE: {m_msg}")
+
 """ ROUTING """
 
 @web_server.route("/", methods=["POST", "GET"])
 @web_server.route("/home", methods=["POST", "GET"])
 def index():
-
-    for m in Messages.query.all():
-        m_user = m.username
-        m_msg = m.msg
-        print(f"USERNAME: {m_user} | MESSAGE: {m_msg}")
 
     if request.method == "POST":
         usr = request.form["username"]
@@ -41,12 +42,14 @@ def index():
             msg = Messages(found_user, message)
             db.session.add(msg)
             db.session.commit()
+            update()
         else:
             msg = Messages(usr, message)
             db.session.add(msg)
             db.session.commit()
+            update()
 
-        return render_template("index.html", user=usr, msg=message)
+        return render_template("index.html")
     else:
         return render_template("index.html")
 
