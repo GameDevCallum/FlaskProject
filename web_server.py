@@ -3,56 +3,39 @@ from flask import redirect, url_for, request
 
 from flask_sqlalchemy import SQLAlchemy
 
+from main_server import *
+
 web_server = Flask(__name__)
 
-web_server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Messages.sqlite3'
+web_server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///DataBase.sqlite3'
 web_server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(web_server)
-
-""" DATABASE """
-
-class Messages(db.Model):
-    _id = db.Column("id", db.Integer, primary_key=True)
-    username = db.Column("username", db.String(100), nullable=False)
-    msg = db.Column("msg", db.String(100), nullable=False)
-
-    def __init__(self, username, msg):
-        self.username = username
-        self.msg = msg
-
-def update():
-    for m in Messages.query.all():
-        m_user = m.username
-        m_msg = m.msg
-        print(f"USERNAME: {m_user} | MESSAGE: {m_msg}")
+DataBase = SQLAlchemy(web_server)
 
 """ ROUTING """
 
-@web_server.route("/", methods=["POST", "GET"])
-@web_server.route("/home", methods=["POST", "GET"])
+@web_server.route("/")
+@web_server.route("/home")
 def index():
+    GetDatabaseData()
+    return render_template("index.html")
+
+@web_server.route("/newUser", methods=["POST", "GET"])
+def newUser():
     if request.method == "POST":
-        print("[[FROM POST]]")
         usr = request.form["username"]
-        message = request.form["message-to-send"]
+        pas = request.form["password"]
 
-        found_user = Messages.query.filter_by(username=usr).first()
+        found_user = QueryDatabase("Username", usr)
+
+        if found_user == False:
+            new = DataBase(usr, pas)
+            db.session.add(new)
+            db.session.commit()
         
-        if found_user:
-            msg = Messages(found_user, message)
-            db.session.add(msg)
-            db.session.commit()
-            update()
-        else:
-            msg = Messages(usr, message)
-            db.session.add(msg)
-            db.session.commit()
-            update()
-
         return render_template("index.html")
     else:
-        print("[[FROM PAGE]]")
-        return render_template("index.html")
+        return render_template("newUser.html")
+
 
 """ ERROR HANDLING """
 
@@ -61,5 +44,5 @@ def error404(error):
     return render_template("error.html", EC="Error! Page Not Found!"), 404
 
 if __name__ == "__main__":
-    db.create_all()
+    DataBase.create_all()
     web_server.run(port="8080")
